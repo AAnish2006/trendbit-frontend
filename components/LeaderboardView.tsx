@@ -100,8 +100,15 @@ export default function LeaderboardView({
 
     // 2. Setup WebSocket connection for live active users and live visitor count updates
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const host = window.location.hostname || "localhost";
-    const wsUrl = `${protocol}//${host}:8000/ws`;
+    const isLocal =
+      typeof window !== "undefined" &&
+      (window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1");
+    const wsUrl =
+      process.env.NEXT_PUBLIC_WS_URL ||
+      (isLocal
+        ? `${protocol}//${window.location.hostname}:8000/ws`
+        : `${protocol}//${window.location.host}/ws`);
 
     const connectWebSocket = () => {
       try {
