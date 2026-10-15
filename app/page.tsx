@@ -3,9 +3,13 @@ import LeaderboardView from "../components/LeaderboardView";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+const API_BACKEND_URL = (
+  process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+).replace(/\/$/, "");
+
 async function getInitialLeaderboard() {
   try {
-    const res = await fetch("http://127.0.0.1:8000/api/leaderboard?page=1&limit=15", {
+    const res = await fetch(`${API_BACKEND_URL}/api/leaderboard?page=1&limit=15`, {
       cache: "no-store",
     });
     if (res.ok) {
@@ -24,7 +28,7 @@ async function getInitialLeaderboard() {
 
 async function getInitialStats() {
   try {
-    const res = await fetch("http://127.0.0.1:8000/api/stats", {
+    const res = await fetch(`${API_BACKEND_URL}/api/stats`, {
       cache: "no-store",
     });
     if (res.ok) {

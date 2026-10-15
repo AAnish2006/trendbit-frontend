@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://trendbit.lol"),
   title: "Trendbit — Pay to climb for rank your ios app",
   description: "The iOS app leaderboard you pay to climb. No ads, no algorithms, no bias. Your bid decides your rank — every listed iOS app gets direct App Store traffic and a free do-follow backlink.",
   keywords: ["iOS apps", "app leaderboard", "pay to climb", "trendbit", "app store rankings", "dodo payments"],
@@ -15,8 +15,11 @@ export const metadata: Metadata = {
     images: ["/logo.png"],
   },
   icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/logo.png", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
     apple: "/logo.png",
   },
 };
@@ -29,7 +32,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/logo.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/logo.png" />
         <script
           async
           src="https://analyzeuser.com/track.js"

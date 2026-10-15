@@ -104,11 +104,18 @@ export default function LeaderboardView({
       typeof window !== "undefined" &&
       (window.location.hostname === "localhost" ||
         window.location.hostname === "127.0.0.1");
-    const wsUrl =
-      process.env.NEXT_PUBLIC_WS_URL ||
-      (isLocal
-        ? `${protocol}//${window.location.hostname}:8000/ws`
-        : `${protocol}//${window.location.host}/ws`);
+
+    let wsUrl = process.env.NEXT_PUBLIC_WS_URL;
+    if (!wsUrl) {
+      if (process.env.NEXT_PUBLIC_API_URL) {
+        const cleanApi = process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "");
+        wsUrl = cleanApi.replace(/^http/, "ws") + "/ws";
+      } else if (isLocal) {
+        wsUrl = `${protocol}//${window.location.hostname}:8000/ws`;
+      } else {
+        wsUrl = `${protocol}//api.trendbit.lol/ws`;
+      }
+    }
 
     const connectWebSocket = () => {
       try {
