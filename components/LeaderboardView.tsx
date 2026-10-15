@@ -62,12 +62,18 @@ export default function LeaderboardView({
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
-      const paymentStatus = params.get("payment");
+      const paymentStatus = params.get("payment") || params.get("status");
       const sessionId = params.get("session_id");
+      const paymentId = params.get("payment_id");
 
-      if (paymentStatus === "success" && sessionId) {
+      if (paymentStatus === "success" || paymentStatus === "succeeded" || sessionId || paymentId) {
+        const query = new URLSearchParams();
+        if (sessionId) query.set("session_id", sessionId);
+        if (paymentId) query.set("payment_id", paymentId);
+        if (paymentStatus) query.set("status", paymentStatus);
+
         // Verify payment with backend
-        fetch(`/api/payments/verify?session_id=${sessionId}`)
+        fetch(`/api/payments/verify?${query.toString()}`)
           .then((r) => r.json())
           .then(() => {
             fetchLeaderboard(1);
@@ -186,7 +192,22 @@ export default function LeaderboardView({
   };
 
   const handleAppClick = useCallback((app: AppItem) => {
-    // 1. Immediately send live click action through WebSocket
+    // 1. Optimistically increment click count locally for zero-latency UI update
+    setApps((prevApps) =>
+      prevApps.map((a) => {
+        const matchId = String(a.id) === String(app.id);
+        const matchTrack = app.track_id && String(a.track_id) === String(app.track_id);
+        if (matchId || matchTrack) {
+          return {
+            ...a,
+            clicks_count: (a.clicks_count || 0) + 1,
+          };
+        }
+        return a;
+      })
+    );
+
+    // 2. Broadcast click action in real-time via WebSocket to all connected clients
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       try {
         wsRef.current.send(
@@ -198,11 +219,9 @@ export default function LeaderboardView({
           })
         );
       } catch {
-        // Fallback
+        // ws error
       }
     }
-    // 2. Also send background POST to guarantee recording
-    fetch(`/api/apps/${app.id}/click`, { method: "POST" }).catch(() => {});
   }, []);
 
   return (

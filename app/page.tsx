@@ -1,12 +1,12 @@
 import LeaderboardView from "../components/LeaderboardView";
 
-// Incremental Static Regeneration (ISR) with 30s background revalidation
-export const revalidate = 30;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 async function getInitialLeaderboard() {
   try {
     const res = await fetch("http://127.0.0.1:8000/api/leaderboard?page=1&limit=15", {
-      next: { revalidate: 30 },
+      cache: "no-store",
     });
     if (res.ok) {
       return await res.json();
@@ -25,7 +25,7 @@ async function getInitialLeaderboard() {
 async function getInitialStats() {
   try {
     const res = await fetch("http://127.0.0.1:8000/api/stats", {
-      next: { revalidate: 30 },
+      cache: "no-store",
     });
     if (res.ok) {
       return await res.json();

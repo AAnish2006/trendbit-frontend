@@ -84,8 +84,6 @@ export default function LeaderboardTable({
   const handleAppClick = (app: AppItem) => {
     if (onAppClick) {
       onAppClick(app);
-    } else {
-      fetch(`/api/apps/${app.id}/click`, { method: "POST" }).catch(() => {});
     }
   };
 
